@@ -100,7 +100,7 @@ contract N0IRStaking is Ownable, ReentrancyGuard {
         emit UnstakeRequested(msg.sender, amount, block.timestamp + cooldownPeriod);
     }
 
-    function completeUnstake() external nonReentrant {
+    function completeUnstake() external nonReentrant updateReward(msg.sender) {
         StakeInfo storage info = stakes[msg.sender];
         require(info.pendingUnstakeAmount > 0, "No pending unstake");
         require(
@@ -215,6 +215,7 @@ contract N0IRStaking is Ownable, ReentrancyGuard {
     }
 
     function setCooldownPeriod(uint256 _cooldownPeriod) external onlyOwner {
+        require(_cooldownPeriod >= 1 days, "Cooldown too short");
         emit CooldownPeriodUpdated(cooldownPeriod, _cooldownPeriod);
         cooldownPeriod = _cooldownPeriod;
     }
