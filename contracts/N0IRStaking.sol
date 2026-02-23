@@ -189,7 +189,9 @@ contract N0IRStaking is Ownable, ReentrancyGuard {
      */
     function notifyRewardAmount(uint256 reward) external onlyOwner updateReward(address(0)) {
         require(tokenSet, "Token not set");
-        n0irToken.safeTransferFrom(msg.sender, address(this), reward);
+
+        uint256 available = n0irToken.balanceOf(address(this)) - totalStaked;
+        require(reward <= available, "Insufficient reward balance");
 
         if (block.timestamp >= periodFinish) {
             rewardRate = reward / rewardsDuration;
